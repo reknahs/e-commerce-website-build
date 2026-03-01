@@ -1,6 +1,7 @@
 "use client"
 
 import { useSearchParams } from "next/navigation"
+import Link from "next/link"
 import { products, categories, colorOptions, priceRanges } from "@/lib/data"
 import { ProductCard } from "./product-card"
 import { useState, useEffect, Suspense } from "react"
@@ -162,7 +163,7 @@ function CatalogInner() {
           {totalPages > 1 && (
             <div className="mt-8 flex items-center justify-center gap-4">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <a
+                <Link
                   key={page}
                   href={`?page=${page}${category !== "All" ? `&category=${category}` : ""}`}
                   className={`flex h-10 w-10 items-center justify-center border text-sm transition-colors ${
@@ -172,7 +173,7 @@ function CatalogInner() {
                   }`}
                 >
                   {page}
-                </a>
+                </Link>
               ))}
             </div>
           )}
