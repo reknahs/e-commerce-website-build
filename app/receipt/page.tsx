@@ -3,7 +3,7 @@
 import { useSearchParams } from "next/navigation"
 import { mockReceipts } from "@/lib/data"
 import Link from "next/link"
-import { Suspense } from "react"
+import { Suspense, useEffect, useState } from "react"
 import { CheckCircle } from "lucide-react"
 
 function ReceiptInner() {
@@ -11,7 +11,30 @@ function ReceiptInner() {
   const orderIdParam = searchParams.get("orderId")
   const orderId = parseInt(orderIdParam || "0", 10)
 
-  const receipt = mockReceipts[orderId]
+  const [isClient, setIsClient] = useState(false)
+
+  useEffect(() => {
+    setIsClient(true)
+  }, [])
+
+  if (!isClient) {
+    return (
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-foreground border-t-transparent" />
+      </div>
+    )
+  }
+
+  let receipt = mockReceipts[orderId]
+  try {
+    const stored = localStorage.getItem("recentOrder")
+    if (stored) {
+      const parsed = JSON.parse(stored)
+      if (parsed.orderId === orderId) {
+        receipt = parsed
+      }
+    }
+  } catch (e) { }
 
   if (!receipt) {
     return (

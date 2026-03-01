@@ -68,9 +68,22 @@ export default function CheckoutPage() {
         const _zipValue = zipData.code.value
       }
       // Order successful
+      const generatedOrderId = Math.floor(Math.random() * 9000) + 1000
+
+      const orderData = {
+        orderId: generatedOrderId,
+        name: shipping.name,
+        address: `${shipping.address}, ${shipping.city}, ${shipping.state} ${shipping.zip}`,
+        lastFour: payment.cardNumber.slice(-4) || "0000",
+        total: total,
+        items: items.map(i => ({ name: i.product.name, qty: i.quantity, price: i.product.price }))
+      }
+
+      localStorage.setItem("recentOrder", JSON.stringify(orderData))
+
       setIsPlacingOrder(true)
       clearCart()
-      router.push("/receipt?orderId=1042")
+      router.push(`/receipt?orderId=${generatedOrderId}`)
     } catch (err) {
       const errObj = err as Error
       setCrashed(true)
