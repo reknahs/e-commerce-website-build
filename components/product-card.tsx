@@ -35,7 +35,10 @@ export function ProductCard({ product }: { product: Product }) {
           ${product.price.toFixed(2)}
         </p>
         <button
-          onClick={() => addItem(product, product.sizes[0], product.colors[0])}
+          onClick={() => {
+            console.log("[v0] ProductCard add clicked:", product.name, product.sizes[0], product.colors[0])
+            addItem(product, product.sizes[0], product.colors[0])
+          }}
           className="mt-2 w-full border border-foreground bg-foreground py-2 text-xs uppercase tracking-widest text-background transition-colors hover:bg-background hover:text-foreground"
         >
           Add to Cart
