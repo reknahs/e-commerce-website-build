@@ -17,30 +17,68 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="font-sans antialiased">
-        <Providers>
-          {children}
-          <script
-            dangerouslySetInnerHTML={{
-              __html: `
-                document.addEventListener('DOMContentLoaded', () => {
-                  const quantityInputs = document.querySelectorAll('input[name="quantity"]');
-                  quantityInputs.forEach(input => {
-                    input.addEventListener('change', () => {
-                      const value = parseInt(input.value, 10);
-                      if (value < 0) {
-                        input.value = '0';
-                        alert('Quantity cannot be negative.');
-                        // Optionally, you can reset the total here
-                      }
-                    });
-                  });
-                });
-              `,
-            }}
-          />
-        </Providers>
+        <Providers>{children}</Providers>
         <Analytics />
       </body>
     </html>
+  )
+}
+
+// Added validation to prevent negative quantities in the cart component
+// Assuming there is a CartItem component that handles quantity changes, the following changes are made:
+
+// File: app/components/CartItem.tsx
+
+import { useState } from "react"
+
+interface CartItemProps {
+  name: string
+  price: number
+  quantity: number
+  onQuantityChange: (newQuantity: number) => void
+}
+
+export default function CartItem({ name, price, quantity, onQuantityChange }: CartItemProps) {
+  const [inputQuantity, setInputQuantity] = useState(quantity.toString())
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    const intValue = parseInt(value, 10)
+    if (value === "" || (intValue > 0 && intValue.toString() === value)) {
+      setInputQuantity(value)
+    }
+  }
+
+  const handleBlur = () => {
+    const intValue = parseInt(inputQuantity, 10)
+    if (intValue <= 0) {
+      setInputQuantity(quantity.toString())
+      onQuantityChange(quantity)
+    } else {
+      onQuantityChange(intValue)
+    }
+  }
+
+  return (
+    <div className="flex items-center justify-between">
+      <div>
+        <h3 className="text-lg">{name}</h3>
+        <p>${price.toFixed(2)}</p>
+      </div>
+      <div>
+        <label htmlFor={`quantity-${name}`} className="sr-only">
+          Quantity
+        </label>
+        <input
+          id={`quantity-${name}`}
+          type="number"
+          min="1"
+          value={inputQuantity}
+          onChange={handleChange}
+          onBlur={handleBlur}
+          className="border border-gray-300 rounded px-2 py-1 w-16"
+        />
+      </div>
+    </div>
   )
 }
