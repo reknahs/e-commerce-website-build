@@ -38,6 +38,7 @@ export function CartDrawer() {
   const discountAmount = subtotal * promoDiscount
   const total = subtotal - discountAmount
 
+  console.log("[v0] CartDrawer - isOpen:", isOpen, "items.length:", items.length)
   if (!isOpen) return null
 
   return (

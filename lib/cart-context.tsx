@@ -32,7 +32,9 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [promoDiscount, setPromoDiscount] = useState(0)
 
   const addItem = useCallback((product: Product, size: string, color: string) => {
+    console.log("[v0] addItem called for:", product.name)
     setItems((prev) => {
+      console.log("[v0] setItems prev length:", prev.length)
       const existing = prev.find(
         (i) => i.product.id === product.id && i.selectedSize === size && i.selectedColor === color
       )
