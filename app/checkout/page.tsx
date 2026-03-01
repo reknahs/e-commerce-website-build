@@ -3,7 +3,6 @@
 import { useState } from "react"
 import { useCart } from "@/lib/cart-context"
 import { useAuth } from "@/lib/auth-context"
-import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
@@ -314,7 +313,7 @@ export default function CheckoutPage() {
             {items.map((item) => (
               <div key={item.product.id} className="flex items-center gap-3">
                 <div className="relative h-14 w-12 shrink-0 overflow-hidden bg-secondary">
-                  <Image src={item.product.image} alt={item.product.name} fill className="object-cover" sizes="48px" />
+                  <img src={item.product.image} alt={item.product.name} className="absolute inset-0 h-full w-full object-cover" />
                 </div>
                 <div className="flex-1">
                   <p className="text-xs font-medium text-foreground">{item.product.name}</p>
