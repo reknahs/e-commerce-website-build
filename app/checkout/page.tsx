@@ -6,6 +6,8 @@ import { useAuth } from "@/lib/auth-context"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 
+// Force HMR cache invalidation
+
 type Step = "shipping" | "payment" | "review"
 
 export default function CheckoutPage() {
