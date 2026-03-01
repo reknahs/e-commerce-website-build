@@ -2,22 +2,23 @@
 
 import { useState } from "react"
 import { useCart } from "@/lib/cart-context"
-import { useAuth } from "@/lib/auth-context"
-import Image from "next/image"
+
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+
+// Force HMR cache invalidation
 
 type Step = "shipping" | "payment" | "review"
 
 export default function CheckoutPage() {
-  const { items, promoDiscount, clearCart } = useCart()
-  const { isAuthenticated, user } = useAuth()
+  const { items, clearCart } = useCart()
+
   const router = useRouter()
 
   const [step, setStep] = useState<Step>("shipping")
   const [shipping, setShipping] = useState({
-    name: user?.name || "",
-    email: user?.email || "",
+    name: "",
+    email: "",
     address: "",
     city: "",
     state: "",
@@ -28,15 +29,14 @@ export default function CheckoutPage() {
     expiry: "",
     cvv: "",
     nameOnCard: "",
+    discountCode: "",
   })
   const [error, setError] = useState<string | null>(null)
-  // CTF #6: Raw Stack Trace Leak state
   const [crashed, setCrashed] = useState(false)
   const [crashError, setCrashError] = useState("")
 
   const subtotal = items.reduce((sum, i) => sum + i.product.price * i.quantity, 0)
-  const discountAmount = subtotal * promoDiscount
-  const total = subtotal - discountAmount
+  const total = subtotal
 
   const handleShippingSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -60,7 +60,6 @@ export default function CheckoutPage() {
   }
 
   const handlePlaceOrder = () => {
-    // CTF #6: Raw Stack Trace Leak - if zip is empty, crash
     try {
       if (!shipping.zip || shipping.zip.trim() === "") {
         // Deliberately cause a crash by accessing properties on undefined
@@ -130,9 +129,8 @@ export default function CheckoutPage() {
         {(["shipping", "payment", "review"] as Step[]).map((s, i) => (
           <div key={s} className="flex items-center gap-4">
             <span
-              className={`text-xs uppercase tracking-widest ${
-                step === s ? "font-semibold text-foreground" : "text-muted-foreground"
-              }`}
+              className={`text-xs uppercase tracking-widest ${step === s ? "font-semibold text-foreground" : "text-muted-foreground"
+                }`}
             >
               {i + 1}. {s}
             </span>
@@ -189,7 +187,6 @@ export default function CheckoutPage() {
                   className="border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-foreground focus:outline-none"
                   required
                 />
-                {/* CTF #6: Zip is required in HTML but not validated in handler */}
                 <input
                   type="text"
                   placeholder="Zip Code *"
@@ -220,6 +217,7 @@ export default function CheckoutPage() {
                 value={payment.nameOnCard}
                 onChange={(e) => setPayment({ ...payment, nameOnCard: e.target.value })}
                 className="border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-foreground focus:outline-none"
+                autoComplete="cc-name"
               />
               <input
                 type="text"
@@ -228,6 +226,7 @@ export default function CheckoutPage() {
                 onChange={(e) => setPayment({ ...payment, cardNumber: e.target.value })}
                 className="border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-foreground focus:outline-none"
                 maxLength={19}
+                autoComplete="cc-number"
               />
               <div className="grid grid-cols-2 gap-4">
                 <input
@@ -237,6 +236,7 @@ export default function CheckoutPage() {
                   onChange={(e) => setPayment({ ...payment, expiry: e.target.value })}
                   className="border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-foreground focus:outline-none"
                   maxLength={5}
+                  autoComplete="cc-exp"
                 />
                 <input
                   type="text"
@@ -245,8 +245,20 @@ export default function CheckoutPage() {
                   onChange={(e) => setPayment({ ...payment, cvv: e.target.value })}
                   className="border border-border bg-background px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-foreground focus:outline-none"
                   maxLength={4}
+                  autoComplete="cc-csc"
                 />
               </div>
+
+              <div className="mt-2 text-left">
+                <input
+                  type="text"
+                  placeholder="Optional: Gift Card or Promo Code"
+                  value={payment.discountCode}
+                  onChange={(e) => setPayment({ ...payment, discountCode: e.target.value })}
+                  className="w-full border border-border bg-background px-4 py-3 text-sm text-background placeholder:text-muted-foreground focus:border-foreground focus:outline-none"
+                />
+              </div>
+
               <div className="flex gap-4">
                 <button
                   type="button"
@@ -314,7 +326,7 @@ export default function CheckoutPage() {
             {items.map((item) => (
               <div key={item.product.id} className="flex items-center gap-3">
                 <div className="relative h-14 w-12 shrink-0 overflow-hidden bg-secondary">
-                  <Image src={item.product.image} alt={item.product.name} fill className="object-cover" sizes="48px" />
+                  <img src={item.product.image} alt={item.product.name} className="absolute inset-0 h-full w-full object-cover" />
                 </div>
                 <div className="flex-1">
                   <p className="text-xs font-medium text-foreground">{item.product.name}</p>
@@ -331,12 +343,6 @@ export default function CheckoutPage() {
               <span>Subtotal</span>
               <span>${subtotal.toFixed(2)}</span>
             </div>
-            {promoDiscount > 0 && (
-              <div className="flex justify-between text-sm text-green-600">
-                <span>Discount</span>
-                <span>-${discountAmount.toFixed(2)}</span>
-              </div>
-            )}
             <div className="flex justify-between text-sm text-foreground">
               <span>Shipping</span>
               <span>Free</span>

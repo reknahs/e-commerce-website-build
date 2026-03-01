@@ -11,7 +11,6 @@ function ReceiptInner() {
   const orderIdParam = searchParams.get("orderId")
   const orderId = parseInt(orderIdParam || "0", 10)
 
-  // CTF #3: IDOR - No ownership check. Any orderId returns data.
   const receipt = mockReceipts[orderId]
 
   if (!receipt) {

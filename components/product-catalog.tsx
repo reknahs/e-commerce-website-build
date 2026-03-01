@@ -1,6 +1,7 @@
 "use client"
 
 import { useSearchParams } from "next/navigation"
+import Link from "next/link"
 import { products, categories, colorOptions, priceRanges } from "@/lib/data"
 import { ProductCard } from "./product-card"
 import { useState, useEffect, Suspense } from "react"
@@ -19,15 +20,14 @@ function CatalogInner() {
 
   useEffect(() => {
     const cat = searchParams.get("category")
-    if (cat) setCategory(cat)
+    setCategory(cat || "All")
   }, [searchParams])
 
-  // CTF #7: Infinite Loading Soft-Lock - Accessories + Red = infinite load
   useEffect(() => {
     if (category === "Accessories" && color === "Red") {
       setLoading(true)
       // Intentional: never resolves
-      new Promise(() => {})
+      new Promise(() => { })
       return
     }
     setLoading(false)
@@ -45,12 +45,9 @@ function CatalogInner() {
   const currentPage = parseInt(pageParam || "1", 10)
   const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE)
 
-  // CTF #8: Out-of-Bounds Pagination Crash
-  // If page is out of bounds, we deliberately access undefined array indices
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
   const pageItems = filtered.slice(startIndex, startIndex + ITEMS_PER_PAGE)
 
-  // CTF #8: crash when page is out of bounds by accessing .name on undefined
   if (currentPage > totalPages && totalPages > 0) {
     const crashItems = (undefined as unknown as typeof products)
     return (
@@ -88,9 +85,8 @@ function CatalogInner() {
       <div className="flex gap-8">
         {/* Filters sidebar */}
         <aside
-          className={`${
-            filtersOpen ? "fixed inset-0 z-40 bg-background p-6" : "hidden"
-          } w-full shrink-0 md:static md:block md:w-48`}
+          className={`${filtersOpen ? "fixed inset-0 z-40 bg-background p-6" : "hidden"
+            } w-full shrink-0 md:static md:block md:w-48`}
         >
           {filtersOpen && (
             <button onClick={() => setFiltersOpen(false)} className="mb-4 md:hidden" aria-label="Close filters">
@@ -105,9 +101,8 @@ function CatalogInner() {
                 <button
                   key={c}
                   onClick={() => { setCategory(c); setFiltersOpen(false) }}
-                  className={`text-left text-sm transition-colors ${
-                    category === c ? "font-medium text-foreground" : "text-muted-foreground hover:text-foreground"
-                  }`}
+                  className={`text-left text-sm transition-colors ${category === c ? "font-medium text-foreground" : "text-muted-foreground hover:text-foreground"
+                    }`}
                 >
                   {c}
                 </button>
@@ -115,39 +110,7 @@ function CatalogInner() {
             </div>
           </div>
 
-          <div className="mb-6">
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Color</h3>
-            <div className="flex flex-col gap-2">
-              {colorOptions.map((c) => (
-                <button
-                  key={c}
-                  onClick={() => { setColor(c); setFiltersOpen(false) }}
-                  className={`text-left text-sm transition-colors ${
-                    color === c ? "font-medium text-foreground" : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {c}
-                </button>
-              ))}
-            </div>
-          </div>
 
-          <div className="mb-6">
-            <h3 className="mb-3 text-xs font-semibold uppercase tracking-widest text-muted-foreground">Price</h3>
-            <div className="flex flex-col gap-2">
-              {priceRanges.map((r) => (
-                <button
-                  key={r.label}
-                  onClick={() => { setPriceRange(r.label); setFiltersOpen(false) }}
-                  className={`text-left text-sm transition-colors ${
-                    priceRange === r.label ? "font-medium text-foreground" : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  {r.label}
-                </button>
-              ))}
-            </div>
-          </div>
         </aside>
 
         {/* Product grid */}
@@ -162,17 +125,16 @@ function CatalogInner() {
           {totalPages > 1 && (
             <div className="mt-8 flex items-center justify-center gap-4">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                <a
+                <Link
                   key={page}
                   href={`?page=${page}${category !== "All" ? `&category=${category}` : ""}`}
-                  className={`flex h-10 w-10 items-center justify-center border text-sm transition-colors ${
-                    page === currentPage
-                      ? "border-foreground bg-foreground text-background"
-                      : "border-border text-muted-foreground hover:border-foreground hover:text-foreground"
-                  }`}
+                  className={`flex h-10 w-10 items-center justify-center border text-sm transition-colors ${page === currentPage
+                    ? "border-foreground bg-foreground text-background"
+                    : "border-border text-muted-foreground hover:border-foreground hover:text-foreground"
+                    }`}
                 >
                   {page}
-                </a>
+                </Link>
               ))}
             </div>
           )}

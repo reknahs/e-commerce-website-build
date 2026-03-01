@@ -1,18 +1,14 @@
 "use client"
 
 import { X, Plus, Minus } from "lucide-react"
-import Image from "next/image"
 import Link from "next/link"
 import { useCart } from "@/lib/cart-context"
 import { useRef, useState } from "react"
 
 export function CartDrawer() {
-  const { items, isOpen, closeCart, removeItem, updateQuantity, promoDiscount, applyPromo } = useCart()
-  const [promoCode, setPromoCode] = useState("")
-  const [promoMsg, setPromoMsg] = useState("")
+  const { items, isOpen, closeCart, removeItem, updateQuantity } = useCart()
   const drawerRef = useRef<HTMLDivElement>(null)
 
-  // CTF #1: DOM-Based Price Manipulation - total is read from data-price attributes
   const getDOMTotal = () => {
     if (!drawerRef.current) {
       return items.reduce((sum, i) => sum + i.product.price * i.quantity, 0)
@@ -27,17 +23,10 @@ export function CartDrawer() {
     return total
   }
 
-  const handleApplyPromo = () => {
-    if (applyPromo(promoCode)) {
-      setPromoMsg("Promo applied!")
-    } else {
-      setPromoMsg("Invalid code")
-    }
-  }
+
 
   const subtotal = getDOMTotal()
-  const discountAmount = subtotal * promoDiscount
-  const total = subtotal - discountAmount
+  const total = subtotal
 
   if (!isOpen) return null
 
@@ -67,7 +56,7 @@ export function CartDrawer() {
               {items.map((item) => (
                 <div key={item.product.id} className="flex gap-4 border-b border-border py-4">
                   <div className="relative h-24 w-20 shrink-0 overflow-hidden bg-secondary">
-                    <Image src={item.product.image} alt={item.product.name} fill className="object-cover" sizes="80px" />
+                    <img src={item.product.image} alt={item.product.name} className="absolute inset-0 h-full w-full object-cover" />
                   </div>
                   <div className="flex flex-1 flex-col justify-between">
                     <div>
@@ -85,7 +74,6 @@ export function CartDrawer() {
                         >
                           <Minus className="h-3 w-3" />
                         </button>
-                        {/* CTF #4: Negative Quantity - type="number" allows negatives */}
                         <input
                           type="number"
                           value={item.quantity}
@@ -101,7 +89,6 @@ export function CartDrawer() {
                           <Plus className="h-3 w-3" />
                         </button>
                       </div>
-                      {/* CTF #1: data-price attribute read by DOM total calculation */}
                       <span
                         data-price={item.product.price.toFixed(2)}
                         data-qty={item.quantity}
@@ -119,40 +106,18 @@ export function CartDrawer() {
             </div>
 
             <div className="border-t border-border px-6 py-4">
-              {/* CTF #9: Promo Code Race Condition */}
-              <div className="mb-4 flex gap-2">
-                <input
-                  type="text"
-                  value={promoCode}
-                  onChange={(e) => setPromoCode(e.target.value)}
-                  placeholder="Promo code"
-                  className="flex-1 border border-border bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
-                />
-                <button
-                  onClick={handleApplyPromo}
-                  className="border border-foreground bg-foreground px-4 py-2 text-xs uppercase tracking-wider text-background transition-colors hover:bg-background hover:text-foreground"
-                >
-                  Apply
-                </button>
-              </div>
-              {promoMsg && <p className="mb-2 text-xs text-muted-foreground">{promoMsg}</p>}
+
 
               <div className="flex justify-between text-sm text-foreground">
                 <span>Subtotal</span>
                 <span>${subtotal.toFixed(2)}</span>
               </div>
-              {promoDiscount > 0 && (
-                <div className="flex justify-between text-sm text-green-600">
-                  <span>Discount ({(promoDiscount * 100).toFixed(1)}%)</span>
-                  <span>-${discountAmount.toFixed(2)}</span>
-                </div>
-              )}
+
               <div className="mt-2 flex justify-between border-t border-border pt-2 text-base font-semibold text-foreground">
                 <span>Total</span>
                 <span>${total.toFixed(2)}</span>
               </div>
 
-              {/* CTF #2: Checkout button that will be blocked by banner on mobile */}
               <Link
                 href="/checkout"
                 onClick={closeCart}

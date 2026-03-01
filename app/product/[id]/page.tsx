@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import Image from "next/image"
 import Link from "next/link"
 import { products } from "@/lib/data"
 import { useCart } from "@/lib/cart-context"
@@ -47,13 +46,10 @@ export default function ProductDetailPage() {
 
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:gap-16">
         <div className="relative aspect-[3/4] overflow-hidden bg-secondary">
-          <Image
+          <img
             src={product.image}
             alt={product.name}
-            fill
-            className="object-cover"
-            sizes="(min-width: 768px) 50vw, 100vw"
-            priority
+            className="absolute inset-0 h-full w-full object-cover"
           />
         </div>
 
