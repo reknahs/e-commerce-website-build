@@ -1,10 +1,13 @@
 import { ProductCatalog } from "@/components/product-catalog"
 
 export default function HomePage() {
-  const router = useRouter();
-  const { page } = router.query;
-  const currentPage = parseInt(page as string) || 1;
+  const [page, setPage] = useState(1);
+  const { data, error } = useFetchProducts(page);
 
-  return <ProductCatalog currentPage={currentPage} />
+  if (error) {
+    return <div>Error loading products</div>;
+  }
+
+  return <ProductCatalog products={data} onPageChange={setPage} />;
 }
 }
