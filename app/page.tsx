@@ -33,7 +33,7 @@ function PromoCodeInput({ onChange }: PromoCodeInputProps) {
 export default function HomePage() {
   const handlePromoCodeChange = (value: string) => {
     // Handle the promo code or gift card input here
-    console.log("Promo code or gift card input:", value);
+    console.log("Promo code or gift card entered:", value);
   };
 
   return (
