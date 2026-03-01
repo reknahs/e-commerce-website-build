@@ -13,11 +13,15 @@ export default function AccountPage() {
 
   // CTF #5: Ghost Session - even after logout, this page is accessible
   // via browser back button because localStorage token isn't cleared
-  if (!isAuthenticated && typeof window !== "undefined") {
-    const token = localStorage.getItem("tb_session_token")
-    const storedUser = localStorage.getItem("tb_user")
-    if (!token || !storedUser) {
-      router.push("/login")
+  if (!isAuthenticated) {
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("tb_session_token")
+      const storedUser = localStorage.getItem("tb_user")
+      if (!token || !storedUser) {
+        router.push("/login")
+        return null
+      }
+    } else {
       return null
     }
     // If token exists in localStorage (ghost session), show the page anyway
