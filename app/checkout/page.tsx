@@ -34,6 +34,7 @@ export default function CheckoutPage() {
   const [error, setError] = useState<string | null>(null)
   const [crashed, setCrashed] = useState(false)
   const [crashError, setCrashError] = useState("")
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false)
 
   const subtotal = items.reduce((sum, i) => sum + i.product.price * i.quantity, 0)
   const total = subtotal
@@ -67,6 +68,7 @@ export default function CheckoutPage() {
         const _zipValue = zipData.code.value
       }
       // Order successful
+      setIsPlacingOrder(true)
       clearCart()
       router.push("/receipt?orderId=1042")
     } catch (err) {
@@ -104,7 +106,7 @@ export default function CheckoutPage() {
     )
   }
 
-  if (items.length === 0) {
+  if (items.length === 0 && !isPlacingOrder) {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-4">
         <p className="text-muted-foreground">Your cart is empty.</p>
