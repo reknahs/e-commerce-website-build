@@ -1,7 +1,6 @@
 "use client"
 
 import { X, Plus, Minus } from "lucide-react"
-import Image from "next/image"
 import Link from "next/link"
 import { useCart } from "@/lib/cart-context"
 import { useRef, useState } from "react"
@@ -39,9 +38,7 @@ export function CartDrawer() {
   const discountAmount = subtotal * promoDiscount
   const total = subtotal - discountAmount
 
-  console.log("[v0] CartDrawer render - isOpen:", isOpen, "itemCount:", items.length)
   if (!isOpen) return null
-  console.log("[v0] CartDrawer OPEN - showing items:", items.map(i => `${i.product.name} x${i.quantity}`).join(", "))
 
   return (
     <>
@@ -69,7 +66,7 @@ export function CartDrawer() {
               {items.map((item) => (
                 <div key={item.product.id} className="flex gap-4 border-b border-border py-4">
                   <div className="relative h-24 w-20 shrink-0 overflow-hidden bg-secondary">
-                    <Image src={item.product.image} alt={item.product.name} fill className="object-cover" sizes="80px" />
+                    <img src={item.product.image} alt={item.product.name} className="absolute inset-0 h-full w-full object-cover" />
                   </div>
                   <div className="flex flex-1 flex-col justify-between">
                     <div>

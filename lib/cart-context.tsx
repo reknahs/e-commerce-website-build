@@ -32,23 +32,18 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const [promoDiscount, setPromoDiscount] = useState(0)
 
   const addItem = useCallback((product: Product, size: string, color: string) => {
-    console.log("[v0] addItem called:", product.name, size, color)
     setItems((prev) => {
       const existing = prev.find(
         (i) => i.product.id === product.id && i.selectedSize === size && i.selectedColor === color
       )
       if (existing) {
-        const updated = prev.map((i) =>
+        return prev.map((i) =>
           i.product.id === product.id && i.selectedSize === size && i.selectedColor === color
             ? { ...i, quantity: i.quantity + 1 }
             : i
         )
-        console.log("[v0] Updated cart items:", updated.length)
-        return updated
       }
-      const newItems = [...prev, { product, quantity: 1, selectedSize: size, selectedColor: color }]
-      console.log("[v0] New cart items:", newItems.length)
-      return newItems
+      return [...prev, { product, quantity: 1, selectedSize: size, selectedColor: color }]
     })
     setIsOpen(true)
   }, [])

@@ -1,6 +1,5 @@
 "use client"
 
-import Image from "next/image"
 import Link from "next/link"
 import type { Product } from "@/lib/data"
 import { useCart } from "@/lib/cart-context"
@@ -14,12 +13,10 @@ export function ProductCard({ product }: { product: Product }) {
   return (
     <div className="group relative flex flex-col">
       <Link href={`/product/${product.id}`} className="relative aspect-[3/4] overflow-hidden bg-secondary">
-        <Image
+        <img
           src={product.image}
           alt={product.name}
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-          sizes="(min-width: 1024px) 25vw, (min-width: 768px) 33vw, 50vw"
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
       </Link>
       {/* CTF #10: overflow-hidden with no text wrap causes button to be pushed out */}
@@ -35,10 +32,7 @@ export function ProductCard({ product }: { product: Product }) {
           ${product.price.toFixed(2)}
         </p>
         <button
-          onClick={() => {
-            console.log("[v0] ProductCard add clicked:", product.name, product.sizes[0], product.colors[0])
-            addItem(product, product.sizes[0], product.colors[0])
-          }}
+          onClick={() => addItem(product, product.sizes[0], product.colors[0])}
           className="mt-2 w-full border border-foreground bg-foreground py-2 text-xs uppercase tracking-widest text-background transition-colors hover:bg-background hover:text-foreground"
         >
           Add to Cart
